@@ -3,8 +3,8 @@ defmodule Expng.Chunk.Header do
 
   defstruct width: nil,
             height: nil,
-            bit_depth: nil,
-            color_type: nil,
+            bit_depth: 8,
+            color_type: 0,
             compression_type: 0,
             filter_method: 0,
             interlace_method: 0
@@ -29,15 +29,18 @@ defmodule Expng.Chunk.Header do
   def init,
     do: %Header{}
 
+  def size({:error, _msg} = error, _width, _height),
+    do: error
+
   def size(header, width, height)
       when is_integer(width) and is_integer(height) and width >= 0 and height >= 0,
       do: %{header | width: width, height: height}
 
-  def size({:error, _msg} = error, _width, _height),
-    do: error
-
   def size(_header, _width, _height),
     do: {:error, "invalid image size"}
+
+  def color_mode({:error, _msg} = error, _),
+    do: error
 
   def color_mode(header, {:grayscale, bit_depth})
       when is_valid_grayscale_depth(bit_depth),
@@ -59,13 +62,12 @@ defmodule Expng.Chunk.Header do
       when is_valid_grayscale_depth(bit_depth),
       do: %{header | color_type: 3, bit_depth: bit_depth}
 
-  def color_mode({:error, _msg} = error, _),
-    do: error
-
   def color_mode(_header, _),
     do: {:error, "invalid color mode"}
 
-  def to_binary(header) do
+  def to_binary({:error, _msg} = error), do: error
+
+  def to_binary(%Header{} = header) do
     %Header{
       width: width,
       height: height,
@@ -86,4 +88,6 @@ defmodule Expng.Chunk.Header do
       interlace_method::8-big
     >>
   end
+
+  def to_binary(_), do: {:error, "invalid header argument"}
 end
