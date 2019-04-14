@@ -165,8 +165,8 @@ defmodule Expng.Chunk.Header do
 
   ## Examples
 
-    iex> Expng.Chunk.Header.create()
-    {:ok, %Expng.Chunk.Header{}}
+      iex> Expng.Chunk.Header.create()
+      {:ok, %Expng.Chunk.Header{}}
 
   """
   @spec create() :: header_or_error()
@@ -179,16 +179,16 @@ defmodule Expng.Chunk.Header do
 
   ## Examples
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(100, 100)
-    {:ok, %Expng.Chunk.Header{width: 100, height: 100}}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(100, 100)
+      {:ok, %Expng.Chunk.Header{width: 100, height: 100}}
 
   Passing wrong values will return error tuple:
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(-1, 100)
-    {:error, "invalid image size"}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(-1, 100)
+      {:error, "invalid image size"}
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(100, :atom)
-    {:error, "invalid image size"}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(100, :atom)
+      {:error, "invalid image size"}
   """
   @spec size(header_or_error(), non_neg_integer(), non_neg_integer()) :: header_or_error()
   def size(header_tuple, width, height)
@@ -206,39 +206,40 @@ defmodule Expng.Chunk.Header do
 
   Color mode argument should be a tuple consisting of color type atom and bit depth.
   Supported color modes are:
-    {:grayscale, 1 | 2 | 4 | 8 | 16}
-    {:grayscale_alpha, 8 | 16}
-    {:color, 8 | 16}
-    {:color_alpha, 8 | 16}
-    {:indexed, 1 | 2 | 4 | 8}
+
+    :grayscale        | 1 | 2 | 4 | 8 | 16
+    :grayscale_alpha  |   |   |   | 8 | 16
+    :color            |   |   |   | 8 | 16
+    :color_alpha      |   |   |   | 8 | 16
+    :indexed          | 1 | 2 | 4 | 8 |
 
   ## Examples
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:grayscale, 1})
-    {:ok, %Expng.Chunk.Header{color_type: 0, bit_depth: 1}}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:grayscale, 1})
+      {:ok, %Expng.Chunk.Header{color_type: 0, bit_depth: 1}}
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:grayscale_alpha, 8})
-    {:ok, %Expng.Chunk.Header{color_type: 4, bit_depth: 8}}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:grayscale_alpha, 8})
+      {:ok, %Expng.Chunk.Header{color_type: 4, bit_depth: 8}}
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:color, 16})
-    {:ok, %Expng.Chunk.Header{color_type: 2, bit_depth: 16}}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:color, 16})
+      {:ok, %Expng.Chunk.Header{color_type: 2, bit_depth: 16}}
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:color_alpha, 8})
-    {:ok, %Expng.Chunk.Header{color_type: 6, bit_depth: 8}}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:color_alpha, 8})
+      {:ok, %Expng.Chunk.Header{color_type: 6, bit_depth: 8}}
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:indexed, 4})
-    {:ok, %Expng.Chunk.Header{color_type: 3, bit_depth: 4}}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:indexed, 4})
+      {:ok, %Expng.Chunk.Header{color_type: 3, bit_depth: 4}}
 
   Passing wrong values will return error tuple:
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:grayscale, -1})
-    {:error, "invalid color mode"}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:grayscale, -1})
+      {:error, "invalid color mode"}
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:color, 2})
-    {:error, "invalid color mode"}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode({:color, 2})
+      {:error, "invalid color mode"}
 
-    iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode(:atom)
-    {:error, "invalid color mode"}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.color_mode(:atom)
+      {:error, "invalid color mode"}
   """
   @spec color_mode(header_or_error(), tuple()) :: header_or_error()
   def color_mode(header_tuple, color_mode) do
@@ -268,28 +269,29 @@ defmodule Expng.Chunk.Header do
   @doc """
   Converts Header structure to its binary representation as defined in PNG specification.
   Header chunk fields should have order and sizes like stated below:
-    width: 4 bytes,
-    height 4 bytes,
-    bit_depth 1 bytes,
-    color_type 1 byte,
-    compression_type 1 byte,
-    filter_method 1 byte,
-    interlace_method 1 byte
+
+    width | 4 bytes
+    height | 4 bytes
+    bit_depth | 1 bytes
+    color_type | 1 byte
+    compression_type | 1 byte
+    filter_method | 1 byte
+    interlace_method | 1 byte
 
   ## Examples
 
   Create binary header for grayscale image with size 100x100 and bit depth equal to 1:
 
-    iex>Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(100, 100) |> Expng.Chunk.Header.color_mode({:grayscale, 1}) |> Expng.Chunk.Header.to_binary()
-    {:ok, <<0, 0, 0, 100, 0, 0, 0, 100, 1, 0, 0, 0, 0>>}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(100, 100) |> Expng.Chunk.Header.color_mode({:grayscale, 1}) |> Expng.Chunk.Header.to_binary()
+      {:ok, <<0, 0, 0, 100, 0, 0, 0, 100, 1, 0, 0, 0, 0>>}
 
   Error at any time when constructing the Header will be passed to the end:
 
-    iex>Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(-1, 100) |> Expng.Chunk.Header.color_mode({:grayscale, 1}) |> Expng.Chunk.Header.to_binary()
-    {:error, "invalid image size"}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(-1, 100) |> Expng.Chunk.Header.color_mode({:grayscale, 1}) |> Expng.Chunk.Header.to_binary()
+      {:error, "invalid image size"}
 
-    iex>Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(100, 100) |> Expng.Chunk.Header.color_mode({:atom, 1}) |> Expng.Chunk.Header.to_binary()
-    {:error, "invalid color mode"}
+      iex> Expng.Chunk.Header.create() |> Expng.Chunk.Header.size(100, 100) |> Expng.Chunk.Header.color_mode({:atom, 1}) |> Expng.Chunk.Header.to_binary()
+      {:error, "invalid color mode"}
   """
   @spec to_binary(header_or_error()) :: {:ok, <<_::104>>} | {:error, any()}
   def to_binary(header_tuple) do
