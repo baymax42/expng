@@ -29,30 +29,41 @@ defmodule Expng.Chunk.Header do
   def init,
     do: %Header{}
 
-  def size(header, width, height),
-    do: %{header | width: width, height: height}
+  def size(header, width, height)
+      when is_integer(width) and is_integer(height) and width >= 0 and height >= 0,
+      do: %{header | width: width, height: height}
 
-  def color_mode(header, mode) do
-    case mode do
-      {:grayscale, bit_depth} when is_valid_grayscale_depth(bit_depth) ->
-        %{header | color_type: 0, bit_depth: bit_depth}
+  def size({:error, _msg} = error, _width, _height),
+    do: error
 
-      {:grayscale_alpha, bit_depth} when is_valid_alpha_depth(bit_depth) ->
-        %{header | color_type: 4, bit_depth: bit_depth}
+  def size(_header, _width, _height),
+    do: {:error, "invalid image size"}
 
-      {:color, bit_depth} when is_valid_color_depth(bit_depth) ->
-        %{header | color_type: 2, bit_depth: bit_depth}
+  def color_mode(header, {:grayscale, bit_depth})
+      when is_valid_grayscale_depth(bit_depth),
+      do: %{header | color_type: 0, bit_depth: bit_depth}
 
-      {:color_alpha, bit_depth} when is_valid_alpha_depth(bit_depth) ->
-        %{header | color_type: 6, bit_depth: bit_depth}
+  def color_mode(header, {:grayscale_alpha, bit_depth})
+      when is_valid_grayscale_depth(bit_depth),
+      do: %{header | color_type: 4, bit_depth: bit_depth}
 
-      {:indexed, bit_depth} when is_valid_indexed_depth(bit_depth) ->
-        %{header | color_type: 3, bit_depth: bit_depth}
+  def color_mode(header, {:color, bit_depth})
+      when is_valid_grayscale_depth(bit_depth),
+      do: %{header | color_type: 2, bit_depth: bit_depth}
 
-      _ ->
-        {:error, "invalid color mode"}
-    end
-  end
+  def color_mode(header, {:color_alpha, bit_depth})
+      when is_valid_grayscale_depth(bit_depth),
+      do: %{header | color_type: 6, bit_depth: bit_depth}
+
+  def color_mode(header, {:indexed, bit_depth})
+      when is_valid_grayscale_depth(bit_depth),
+      do: %{header | color_type: 3, bit_depth: bit_depth}
+
+  def color_mode({:error, _msg} = error, _),
+    do: error
+
+  def color_mode(_header, _),
+    do: {:error, "invalid color mode"}
 
   def to_binary(header) do
     %Header{
